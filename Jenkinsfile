@@ -7,6 +7,7 @@ pipeline {
       APP_NAME          = 'golang-http'
       GIT_PROVIDER      = 'github.com'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+      REGISTRY          = 'docker-registry.jx.www.sparrow.li'
     }
     stages {
       stage('CI Build and push snapshot') {
@@ -26,7 +27,7 @@ pipeline {
               sh 'export VERSION=$PREVIEW_VERSION && skaffold run -f skaffold.yaml'
 
               sh "jx step validate --min-jx-version 1.2.36"
-              sh "jx step post build --image \$JENKINS_X_DOCKER_REGISTRY_SERVICE_HOST:\$JENKINS_X_DOCKER_REGISTRY_SERVICE_PORT/$ORG/$APP_NAME:$PREVIEW_VERSION"
+              sh "jx step post build --image \${REGISTRY}/$ORG/$APP_NAME:$PREVIEW_VERSION"
             }
           }
           dir ('/home/jenkins/go/src/github.com/danielfbm/golang-http/charts/preview') {
@@ -64,7 +65,7 @@ pipeline {
                 sh 'export VERSION=`cat VERSION` && skaffold run -f skaffold.yaml'
                 sh "jx step validate --min-jx-version 1.2.36"
                 // sh "jx step post build --image \$JENKINS_X_DOCKER_REGISTRY_SERVICE_HOST:\$JENKINS_X_DOCKER_REGISTRY_SERVICE_PORT/$ORG/$APP_NAME:\$(cat VERSION)"
-                sh "jx step post build --image docker-registry.jx.www.sparrow.li/$ORG/$APP_NAME:\$(cat VERSION)"
+                sh "jx step post build --image ${REGISTRY}/$ORG/$APP_NAME:\$(cat VERSION)"
               }
             }
           }
