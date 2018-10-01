@@ -14,9 +14,10 @@ pipeline {
     stages {
       stage('Checkout') {
         steps {
-          def scmVar = checkout scm
-          env.TAG = "build-${BUILD_ID}"
-
+          script {
+            def scmVar = checkout scm
+            env.TAG = "build-${BUILD_ID}"
+          }
         }
       }
       stage('CI') {
@@ -52,19 +53,27 @@ pipeline {
               }
             }
           }
-          stage('Deploy') {
-            steps {
-              container('tools'){
-                  timeout(time:300, unit: "SECONDS"){
-                      alaudaDevops.withProject(env.PROJECT) {
-                          def p = alaudaDevops.selector('deploy', env.APP).object()
-                          p.metadata.labels['BUILD_ID']=env.BUILD_ID
-                          p.spec.template.spec.containers[0]['image'] = "${IMAGE_REPOSITORY}:${TAG}"
-                          alaudaDevops.apply(p)
-                      }
+        }
+      }
+      stage('Deploy') {
+        steps {
+          container('tools'){
+              timeout(time:300, unit: "SECONDS"){
+                  alaudaDevops.withProject(env.PROJECT) {
+                      def p = alaudaDevops.selector('deploy', env.APP).object()
+                      p.metadata.labels['BUILD_ID']=env.BUILD_ID
+                      p.spec.template.spec.containers[0]['image'] = "${IMAGE_REPOSITORY}:${TAG}"
+                      alaudaDevops.apply(p)
                   }
               }
-            }
+          }
+        }
+      }
+      stage('Testing') {
+        steps {
+          sleep 10
+          container('tools'){
+            sh "curl --fail http://golang-http.project-k -v"
           }
         }
       }
