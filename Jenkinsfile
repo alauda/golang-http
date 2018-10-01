@@ -7,12 +7,16 @@ pipeline {
       FOLDER = 'src/github.com/danielfbm/golang-http'
       GOPATH = "${WORKSPACE}"
       DEV_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http-dev'
-      ONLINE_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http'
+      IMAGE_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http'
+      CREDENTIALS = 'project-k-harbor'
+      APP = 'golang-http'
     }
     stages {
       stage('Checkout') {
         steps {
-          var scmVar = checkout scm
+          def scmVar = checkout scm
+          env.TAG = "build-${BUILD_ID}"
+
         }
       }
       stage('CI') {
@@ -39,9 +43,26 @@ pipeline {
                   sh "go build -v -obin/golang-http"
                 }
                 container('tools') {
-                  sh "docker build -t ${PROJECT}/golang-http:build-${BUILD_ID} ."
-                  
+                  sh "docker build -t ${IMAGE_REPOSITORY}:${TAG} ."
+                  withCredentials([usernamePassword(credentialsId: CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                    sh "docker login ${IMAGE_REPOSITORY} -u ${USERNAME} -p ${PASSWORD}"
+                  }
+                  sh "docker push ${IMAGE_REPOSITORY}:${TAG}"
                 }
+              }
+            }
+          }
+          stage('Deploy') {
+            steps {
+              container('tools'){
+                  timeout(time:300, unit: "SECONDS"){
+                      alaudaDevops.withProject(env.PROJECT) {
+                          def p = alaudaDevops.selector('deploy', env.APP).object()
+                          p.metadata.labels['BUILD_ID']=env.BUILD_ID
+                          p.spec.template.spec.containers[0]['image'] = "${IMAGE_REPOSITORY}:${TAG}"
+                          alaudaDevops.apply(p)
+                      }
+                  }
               }
             }
           }
