@@ -41,10 +41,16 @@ pipeline {
             }
           }
           stage('Build') {
+            environment {
+              CGO_ENABLED: "0"
+              GOOS: "linux"
+              GOARCH: "amd64"
+            }
             steps {
               dir(FOLDER) {
                 container('golang') {
                   sh "go build -v -o bin/golang-http"
+                  sh "chmod +x bin/golang-http"
                 }
                 container('tools') {
                   sh "docker build -t ${IMAGE_REPOSITORY}:${TAG} ."
