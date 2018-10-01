@@ -6,6 +6,8 @@ pipeline {
       PROJECT = 'project-k'
       FOLDER = 'src/github.com/danielfbm/golang-http'
       GOPATH = "${WORKSPACE}"
+      DEV_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http-dev'
+      ONLINE_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http'
     }
     stages {
       stage('Checkout') {
@@ -38,6 +40,7 @@ pipeline {
                 }
                 container('tools') {
                   sh "docker build -t ${PROJECT}/golang-http:build-${BUILD_ID} ."
+                  
                 }
               }
             }
