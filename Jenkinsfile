@@ -44,7 +44,7 @@ pipeline {
             steps {
               dir(FOLDER) {
                 container('golang') {
-                  sh "go build -v -obin/golang-http"
+                  sh "go build -v -o bin/golang-http"
                 }
                 container('tools') {
                   sh "docker build -t ${IMAGE_REPOSITORY}:${TAG} ."
