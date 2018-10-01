@@ -23,8 +23,9 @@ pipeline {
         }
       }
       stage('CI') {
+        failFast true
         parallel {
-          stage('Unit Tests') {
+          stage('Unit Tests & Scan') {
             steps {
               dir(FOLDER) {
                 container('golang') {
@@ -33,7 +34,7 @@ pipeline {
                 }
                 container('tools') {
                   withSonarQubeEnv('sonarqube') {
-                    sh "sonar-scanner -X"
+                    sh "sonar-scanner"
                   }
                 }
               }
@@ -77,7 +78,7 @@ pipeline {
         steps {
           sleep 10
           container('tools'){
-            sh "curl --fail http://golang-http.project-k -v"
+            sh "curl --fail http://golang-http.project-k:8080 -v"
           }
         }
       }
