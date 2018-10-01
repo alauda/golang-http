@@ -57,15 +57,17 @@ pipeline {
       }
       stage('Deploy') {
         steps {
-          container('tools'){
-              timeout(time:300, unit: "SECONDS"){
-                  alaudaDevops.withProject(env.PROJECT) {
-                      def p = alaudaDevops.selector('deploy', env.APP).object()
-                      p.metadata.labels['BUILD_ID']=env.BUILD_ID
-                      p.spec.template.spec.containers[0]['image'] = "${IMAGE_REPOSITORY}:${TAG}"
-                      alaudaDevops.apply(p)
-                  }
-              }
+          script {
+            container('tools'){
+                timeout(time:300, unit: "SECONDS"){
+                    alaudaDevops.withProject(env.PROJECT) {
+                        def p = alaudaDevops.selector('deploy', env.APP).object()
+                        p.metadata.labels['BUILD_ID']=env.BUILD_ID
+                        p.spec.template.spec.containers[0]['image'] = "${IMAGE_REPOSITORY}:${TAG}"
+                        alaudaDevops.apply(p)
+                    }
+                }
+            }
           }
         }
       }
