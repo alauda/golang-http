@@ -77,5 +77,16 @@ pipeline {
           }
         }
       }
+      stage('Promoting') {
+        steps {
+          container('tools') {
+            sh "docker tag ${IMAGE_REPOSITORY}:${TAG} ${IMAGE_REPOSITORY}:release"
+            withCredentials([usernamePassword(credentialsId: CREDENTIALS, passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+              sh "docker login ${IMAGE_REPOSITORY} -u ${USERNAME} -p ${PASSWORD}"
+            }
+            sh "docker push ${IMAGE_REPOSITORY}:release"
+          }
+        }
+      }
     }
   }
