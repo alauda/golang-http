@@ -15,8 +15,10 @@ pipeline {
       stage('Checkout') {
         steps {
           script {
-            def scmVar = checkout scm
-            env.TAG = "build-${BUILD_ID}"
+            dir(env.FOLDER) {
+              def scmVar = checkout scm
+              env.TAG = "build-${BUILD_ID}"
+            }
           }
         }
       }
