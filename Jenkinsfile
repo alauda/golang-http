@@ -25,13 +25,19 @@ pipeline {
       stage('CI') {
         failFast true
         parallel {
-          stage('Unit Tests & Scan') {
+          stage('Unit Tests') {
             steps {
               dir(FOLDER) {
                 container('golang') {
                   sh "go test -cover -v -json > test.json"
                   sh "go test -v -coverprofile=coverage.out -covermode=count ."
                 }
+              }
+            }
+          }
+          stage('Code Scan') {
+            steps {
+              dir(FOLDER) {
                 container('tools') {
                   withSonarQubeEnv('sonarqube') {
                     sh "sonar-scanner"
