@@ -4,10 +4,9 @@ pipeline {
     }
     environment {
       PROJECT = 'project-k'
-      FOLDER = 'src/github.com/danielfbm/golang-http'
+      FOLDER = 'src/github.com/alauda/golang-http'
       GOPATH = "${WORKSPACE}"
-      DEV_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http-dev'
-      IMAGE_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/go-http'
+      IMAGE_REPOSITORY = 'harbor.harbor-default.k8s-prod.mathilde.com.cn/project-k/golang-http'
       CREDENTIALS = 'project-k-harbor'
       APP = 'golang-http'
     }
