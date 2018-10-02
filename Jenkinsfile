@@ -89,7 +89,7 @@ pipeline {
         steps {
           sleep 10
           container('tools'){
-            sh "curl --fail http://golang-http.project-k:8080 -v"
+            sh "curl --fail http://golang-http.project-k.k8s-prod.mathilde.com.cn:80 -v"
           }
         }
       }
