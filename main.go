@@ -7,7 +7,7 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	title := "Alauda Container Platform"
+	title := "Alauda DevOps"
 
 	from := ""
 	if r.URL != nil {
